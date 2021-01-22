@@ -2,7 +2,7 @@
     width: 100%;
     margin: auto;
     height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
     text-align: center;
     font-weight: bold;
     font-size: 1rem;

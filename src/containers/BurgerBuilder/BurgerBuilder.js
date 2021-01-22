@@ -7,6 +7,7 @@ import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import axios from '../../axios-orders';
 import Spinner from '../../components/UI/Spinner/Spinner'
+import { withRouter } from 'react-router-dom';
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
@@ -35,6 +36,8 @@ class BurgerBuilder extends Component {
         loading: false
     };
 
+    componentDidMount() {
+    }
     updatedPurchaseState(ingredients) {
         const sum = Object.keys(ingredients).map(igKey => {
             return ingredients[igKey];
@@ -84,28 +87,15 @@ class BurgerBuilder extends Component {
         this.setState({purchasing: false});
     }
     purchaseContinueHandler = () => {
-        this.setState({loading: true});
-        const order = {
-            ingredients: this.state.ingredients,
-            price: this.state.totalPrice,
-            customer: {
-                name: 'AMYR',
-                address: {
-                    street: '17 Shahrivar',
-                    zipCode: '42424',
-                    country: 'Germany'
-                },
-                email: 'awp.1379@gmail.com'
-            },
-            'deliveryMethod': 'fastest'
-        };
-        axios.post('/orders', order).then(resp => {
-            console.log(resp);
-            this.setState({loading: false, purchasing: false});
-        }).catch(error => {
-            console.log(error);
-            this.setState({loading: false, purchasing: false});
-        })
+        const query = [];
+        query.push('price=' + encodeURIComponent(this.state.totalPrice));
+        for (let i in this.state.ingredients) {
+            query.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+        }
+        this.props.history.push({
+            pathname: '/checkout',
+            search: '?' + query.join('&')
+        });
     };
     render() {
         const disabledInfo = {
@@ -144,4 +134,4 @@ class BurgerBuilder extends Component {
         );
     }
 }
-export default withErrorHandler(BurgerBuilder, axios);
+export default withErrorHandler(withRouter(BurgerBuilder), axios);
