@@ -25,7 +25,8 @@ class Checkout extends Component {
     }
     purchaseHandler = () => {
         this.props.history.push({
-            pathname: this.props.match.path + '/contact-data'
+            pathname: this.props.match.path + '/contact-data',
+            search: this.props.location.search
         })
     }
     cancelHandler = () => {

@@ -3,38 +3,140 @@ import classes from './ContactData.css';
 import Button from '../../UI/Button/Button';
 import axios from '../../../axios-orders';
 import Spinner from '../../UI/Spinner/Spinner';
+import Input from '../../UI/Input/Input';
+import { withRouter } from 'react-router-dom';
 
 class ContactData extends Component {
     state = {
-        name: '',
-        email: '',
-        address: {
-            street: '',
-            postalCode: ''
+        orderForm: {
+            name: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    label: 'نام شما',
+                    placeholder: 'نام خود را وارد کنید.'
+                },
+                value: '',
+                validation: {
+                    shouldValidate: true,
+                    isValid: false,
+                    touched: false,
+                    rules: {
+                        required: true
+                    }
+                }
+            },
+            email: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'email',
+                    label: 'ایمیل شما',
+                    placeholder: 'ایمیل خود را وارد کنید.'
+                },
+                value: '',
+                validation: {
+                    shouldValidate: true,
+                    isValid: false,
+                    touched: false,
+                    rules: {
+                        required: true
+                    }
+                }
+            },
+            street: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    label: 'خیابان سکونت شما',
+                    placeholder: 'خیابان سکونت خود را وارد کنید.'
+                },
+                value: '',
+                validation: {
+                    shouldValidate: true,
+                    isValid: false,
+                    touched: false,
+                    rules: {
+                        required: true
+                    }
+                }
+            },
+            postalCode: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    label: 'کد پستی شما',
+                    placeholder: 'کد پستی خود را وارد کنید.'
+                },
+                value: '',
+                validation: {
+                    shouldValidate: true,
+                    isValid: false,
+                    touched: false,
+                    rules: {
+                        required: true,
+                        minLength: 5,
+                        maxLength: 7
+                    }
+                }
+            },
+            delivery_method: {
+                elementType: 'dropdown',
+                elementConfig: {
+                    type: 'text',
+                    label: 'نوع ارسال',
+                    options: [
+                        {
+                            value: 'fastest',
+                            displayValue: 'سریع ترین'
+                        },
+                        {
+                            value: 'cheapest',
+                            displayValue: 'ارزان ترین'
+                        }
+                    ]
+                },
+                validation: {
+                    shouldValidate: false,
+                    isValid: true,
+                    touched: false,
+                    rules: null
+                },
+                value: 'cheapest',
+            }
         },
-        loading: false
+        loading: false,
+        ingredients: null,
+        totalPrice: null
+    }
+    componentDidMount() {
+        const query = new URLSearchParams(this.props.location.search);
+        const ingredients = {};
+        let price = 0;
+        for (let param of query.entries()) {
+            if (param[0] === 'price')
+                price = +param[1]
+            else
+                ingredients[param[0]] = +param[1];
+        }
+        this.setState({ingredients: ingredients, totalPrice: price});
     }
     orderHandler = (event) => {
         event.preventDefault();
         this.setState({loading: true});
-        const order = {
-            ingredients: this.props.ingredients,
-            price: this.props.totalPrice,
-            customer: {
-                name: 'AMYR',
-                address: {
-                    street: '17 Shahrivar',
-                    zipCode: '42424',
-                    country: 'Germany'
-                },
-                email: 'awp.1379@gmail.com'
-            },
-            'deliveryMethod': 'fastest'
-        };
-        axios.post('/orders.json', order).then(resp => {
-            console.log(resp);
+        let customerData = {};
+        for (let name in this.state.orderForm) {
+
+            customerData[name] = this.state.orderForm[name]['value'];
+        }
+
+        const myOrder = {
+            ingredients: this.state.ingredients,
+            price: this.state.totalPrice,
+            customer: customerData
+        }
+        console.log(myOrder);
+        axios.post('/orders.json', myOrder).then(resp => {
             this.setState({loading: false, purchasing: false});
-            console.log(this.props);
             this.props.history.push({
                 pathname: '/',
                 search: '?order=1'
@@ -44,18 +146,55 @@ class ContactData extends Component {
             this.setState({loading: false, purchasing: false});
         })
     }
+    onUpdateInput = (event) => {
+        const newOrderForm = {
+            ...this.state.orderForm
+        };
+        const inputForm = newOrderForm[event.target.name];
+        inputForm.value = event.target.value;
+        inputForm.validation.isValid = this.checkValidaty(event.target.name, event.target.value);
+        inputForm.validation.touched = true;
+        this.setState({orderForm: newOrderForm})
+    }
+
+    checkValidaty = (name, value) => {
+        const inputOrderForm = this.state.orderForm[name]['validation'];
+        if (!inputOrderForm.shouldValidate)
+            return true;
+        let isValid = true;
+        if (inputOrderForm.rules.required) {
+            isValid = value.trim() !== '' && isValid;
+        }
+        if (inputOrderForm.rules.minLength) {
+            isValid = value.length >= inputOrderForm.rules.minLength && isValid;
+        }
+        if (inputOrderForm.rules.maxLength) {
+            isValid = value.length <= inputOrderForm.rules.maxLength && isValid;
+        }
+        return isValid;
+    }
     render() {
+        let elements = [];
+        let orderAllowed = true;
+        for(let name in this.state.orderForm) {
+            let el = this.state.orderForm[name];
+            let createdInput = <Input
+            invalid={!el.validation.isValid && el.validation.touched}
+            changeHandler={this.onUpdateInput}
+            key={name}
+            name={name}
+            inputtype={el.elementType}
+            config={el.elementConfig}
+            value={el.value} />
+            elements.push(createdInput)
+            
+            orderAllowed = orderAllowed && el.validation.isValid;
+
+        };
         let form = (
             <form>
-                <label htmlFor="NameInput">نام شما: </label>
-                <input id="NameInput" type="text" name="name" placeholder="نام خود را وارد کنید" />
-                <label htmlFor="EmailInput">ایمیل شما: </label>
-                <input id="EmailInput" type="email" name="email" placeholder="ایمیل خود را وارد کنید" />
-                <label htmlFor="StreetInput">خیابان شما: </label>
-                <input id="StreetInput" type="text" name="address[street]" placeholder="خیابان محل سکونت را وارد کنید" />
-                <label htmlFor="PostalCodeInput">کد پستی: </label>
-                <input id="PostalCodeInput" type="text" name="address[postalCode]" placeholder="کد پستی خود را وارد کنید" />
-                <Button clicked={this.orderHandler} btnType="Success">ثبت سفارش</Button>
+                { elements }
+                <Button disabled={!orderAllowed} clicked={this.orderHandler} btnType="Success">ثبت سفارش</Button>
             </form>
         );
         if (this.state.loading) {
@@ -70,4 +209,4 @@ class ContactData extends Component {
     }
 }
 
-export default ContactData;
+export default withRouter(ContactData);

@@ -12,7 +12,7 @@ const checkoutSummary = (props) => {
         <Button clicked={ props.purchaseClick }btnType="Success">ثبت</Button>
         <Button clicked={ props.cancelClick } btnType="Danger">لغو</Button>
 
-        <Route path="/checkout/contact-data" render={ (props) => (<ContactData {...props} />)} />
+        <Route path="/checkout/contact-data" render={ (props) => (<ContactData {...props} ingredients={props.ingredients} />)} />
         </div>
     );
 };

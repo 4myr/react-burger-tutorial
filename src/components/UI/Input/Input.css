@@ -1,0 +1,29 @@
+.DivInput {
+    box-shadow: grey 1px 1px 5px 1px;
+    margin: 15px auto;
+    padding: 30px;
+    width: 20%;
+}
+.Input {
+    font-family: inherit;
+    display: block;
+    margin: auto;
+    width: 300px;
+}
+
+.Textarea {
+    display: block;
+    margin: auto;
+    width: 300px;
+}
+.Label {
+    padding: 0 20px 0 20px;
+    display: block;
+}
+
+.Dropdown {
+    font-family: inherit;
+}
+.Invalid {
+    border: 1px red solid;
+}
