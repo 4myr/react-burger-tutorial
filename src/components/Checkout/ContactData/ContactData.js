@@ -5,6 +5,7 @@ import axios from '../../../axios-orders';
 import Spinner from '../../UI/Spinner/Spinner';
 import Input from '../../UI/Input/Input';
 import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 class ContactData extends Component {
     state = {
@@ -104,21 +105,20 @@ class ContactData extends Component {
                 value: 'cheapest',
             }
         },
-        loading: false,
-        ingredients: null,
-        totalPrice: null
+        loading: false
     }
     componentDidMount() {
-        const query = new URLSearchParams(this.props.location.search);
-        const ingredients = {};
-        let price = 0;
-        for (let param of query.entries()) {
-            if (param[0] === 'price')
-                price = +param[1]
-            else
-                ingredients[param[0]] = +param[1];
-        }
-        this.setState({ingredients: ingredients, totalPrice: price});
+        console.log(this.props);
+        // const query = new URLSearchParams(this.props.location.search);
+        // const ingredients = {};
+        // let price = 0;
+        // for (let param of query.entries()) {
+        //     if (param[0] === 'price')
+        //         price = +param[1]
+        //     else
+        //         ingredients[param[0]] = +param[1];
+        // }
+        // this.setState({ingredients: ingredients, totalPrice: price});
     }
     orderHandler = (event) => {
         event.preventDefault();
@@ -130,8 +130,8 @@ class ContactData extends Component {
         }
 
         const myOrder = {
-            ingredients: this.state.ingredients,
-            price: this.state.totalPrice,
+            ingredients: this.props.ings,
+            price: this.props.price,
             customer: customerData
         }
         console.log(myOrder);
@@ -209,4 +209,11 @@ class ContactData extends Component {
     }
 }
 
-export default withRouter(ContactData);
+
+const mapStateToProps = (state) => {
+    return {
+        ings: state.ingredients,
+        price: state.totalPrice
+    }
+}
+export default withRouter(connect(mapStateToProps)(ContactData));
