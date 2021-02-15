@@ -9,6 +9,7 @@ import axios from '../../axios-orders';
 import Spinner from '../../components/UI/Spinner/Spinner'
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+import * as burgerBuilderActions from '../../store/actions';
 
 
 class BurgerBuilder extends Component {
@@ -25,6 +26,7 @@ class BurgerBuilder extends Component {
     };
 
     componentDidMount() {
+    console.log('test');
     }
     updatedPurchaseState() {
         const sum = Object.keys(this.props.ings).map(igKey => {
@@ -132,8 +134,8 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch) => {
     return {
-        onAddIngredient: (type) => dispatch({type: 'ADD_INGREDIENT', item: type}),
-        onRemoveIngredient: (type) => dispatch({type: 'REMOVE_INGREDIENT', item: type})
+        onAddIngredient: (type) => dispatch(burgerBuilderActions.addIngredient(type)),
+        onRemoveIngredient: (type) => dispatch(burgerBuilderActions.removeIngredient(type))
     }
 }
 export default withErrorHandler(withRouter(connect(mapStateToProps, mapDispatchToProps)(BurgerBuilder)), axios);

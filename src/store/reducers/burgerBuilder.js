@@ -1,4 +1,4 @@
-import * as actionTypes from './actions'; 
+import * as actionTypes from '../actions/actionTypes'; 
 const initialStore = {
     ingredients: {
       salad: 0,
@@ -10,7 +10,7 @@ const initialStore = {
   }
 
 
-export const reducer = (store = initialStore, action) => {
+export const burgerBuilderReducer = (store = initialStore, action) => {
     const INGREDIENT_PRICES = {
         salad: 0.5,
         cheese: 0.4,
@@ -20,15 +20,15 @@ export const reducer = (store = initialStore, action) => {
     
     switch (action.type) {
         case(actionTypes.ADD_INGREDIENT):
-        const addIngredients = {
-            ...store.ingredients,
-        }
-        addIngredients[action.item] = addIngredients[action.item] + 1
-        return {
-            ...store,
-            ingredients: addIngredients,
-            totalPrice: store.totalPrice + INGREDIENT_PRICES[action.item]
-        }
+            const addIngredients = {
+                ...store.ingredients,
+            }
+            addIngredients[action.item] = addIngredients[action.item] + 1
+            return {
+                ...store,
+                ingredients: addIngredients,
+                totalPrice: store.totalPrice + INGREDIENT_PRICES[action.item]
+            }
         case(actionTypes.REMOVE_INGREDIENT):
             const removeIngredients = {
             ...store.ingredients,
