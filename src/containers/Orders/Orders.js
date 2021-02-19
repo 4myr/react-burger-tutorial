@@ -4,6 +4,7 @@ import axios from '../../axios-orders';
 import classes from './Orders.css';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import * as orderActions from '../../store/actions'
 
 class Orders extends Component {
@@ -29,8 +30,10 @@ class Orders extends Component {
         )
         
         if (this.props.error) {
-            console.log('testt')
             orders = <p>An Error ocurred</p>;
+        }
+        else if (!this.props.isAuthenticated) {
+            orders = <Redirect to="/" />
         }
         else if (this.props.orders) {
             orders = this.props.orders.map(v => {
@@ -50,7 +53,8 @@ const mapStateToProps = (state) => {
     return {
         orders: state.order.orders,
         loading: state.order.loading,
-        error: state.order.error
+        error: state.order.error,
+        isAuthenticated: state.auth.isAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {

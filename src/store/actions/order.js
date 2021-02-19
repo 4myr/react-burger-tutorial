@@ -52,7 +52,8 @@ export const fetchOrdersInit = () => {
 export const fetchOrders = () => {
     return dispatch => {
         dispatch(fetchOrdersInit());
-        axios.get('/orders.json').then(resp => {
+        const params = "?orderBy=\"userId\"&equalTo=\"" + localStorage.getItem('userId') + "\""
+        axios.get('/orders.json' + params).then(resp => {
             const fetchedOrders = [];
             for (let i in resp.data) {
                 fetchedOrders.push({

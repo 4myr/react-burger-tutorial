@@ -35,7 +35,7 @@ class BurgerBuilder extends Component {
         }).reduce((sum,el) => {
             return sum + el;
         }, 0);
-        return sum > 0;
+        return sum > 0 && this.props.isAuthenticated;
     }
     addIngredientHandler = (type) => {
         // const oldCount = this.state.ingredients[type];
@@ -132,7 +132,8 @@ const mapStateToProps = (state) => {
     return {
         ings: state.burgerBuilder.ingredients,
         price: state.burgerBuilder.totalPrice,
-        error: state.order.error
+        error: state.order.error,
+        isAuthenticated: state.auth.isAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {

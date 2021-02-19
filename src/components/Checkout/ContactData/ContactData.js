@@ -126,14 +126,14 @@ class ContactData extends Component {
         this.setState({loading: true});
         let customerData = {};
         for (let name in this.state.orderForm) {
-
             customerData[name] = this.state.orderForm[name]['value'];
         }
 
         const myOrder = {
             ingredients: this.props.ings,
             price: this.props.price,
-            customer: customerData
+            customer: customerData,
+            userId: localStorage.getItem('userId')
         }
         this.props.onPurchaseStart(myOrder);
         // console.log(myOrder);
