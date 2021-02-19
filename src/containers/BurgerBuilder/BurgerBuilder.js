@@ -10,6 +10,7 @@ import Spinner from '../../components/UI/Spinner/Spinner'
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as burgerBuilderActions from '../../store/actions';
+import * as orderActions from '../../store/actions';
 
 
 class BurgerBuilder extends Component {
@@ -26,7 +27,7 @@ class BurgerBuilder extends Component {
     };
 
     componentDidMount() {
-    console.log('test');
+        this.props.onInitIngredients();
     }
     updatedPurchaseState() {
         const sum = Object.keys(this.props.ings).map(igKey => {
@@ -95,18 +96,19 @@ class BurgerBuilder extends Component {
             disabledInfo[key] = disabledInfo[key] <= 0;
         }
         
-        let orderSummary = <OrderSummary
+        let orderSummary = this.props.error ? 'An error has been occurred!' : <OrderSummary
                         purchaseCanceled={this.purchaseCancelHandler}
                         purchaseContinued={this.purchaseContinueHandler}
                         price={this.props.price}
                         ingredients={this.props.ings}
                         translate_ingredient={this.state.translate_ingredient} />
+        
         if(this.state.loading) {
             orderSummary = <Spinner />
         }
         return (
             <Aux>
-                <Modal show={this.state.purchasing}
+                <Modal show={this.state.purchasing || this.props.error}
                     modalClosed={this.purchaseCancelHandler}>
                     {orderSummary}
                 </Modal>
@@ -128,14 +130,17 @@ class BurgerBuilder extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        ings: state.ingredients,
-        price: state.totalPrice
+        ings: state.burgerBuilder.ingredients,
+        price: state.burgerBuilder.totalPrice,
+        error: state.order.error
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         onAddIngredient: (type) => dispatch(burgerBuilderActions.addIngredient(type)),
-        onRemoveIngredient: (type) => dispatch(burgerBuilderActions.removeIngredient(type))
+        onRemoveIngredient: (type) => dispatch(burgerBuilderActions.removeIngredient(type)),
+        onInitIngredients: () => dispatch(burgerBuilderActions.initIngredients()),
+        onPurchaseBurger: (data) => dispatch(orderActions.purchaseBurgerStart(data))
     }
 }
-export default withErrorHandler(withRouter(connect(mapStateToProps, mapDispatchToProps)(BurgerBuilder)), axios);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(BurgerBuilder)   );

@@ -6,6 +6,9 @@ import Spinner from '../../UI/Spinner/Spinner';
 import Input from '../../UI/Input/Input';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
+import * as orderActions from '../../../store/actions';
+import Modal from '../../UI/Modal/Modal'
 
 class ContactData extends Component {
     state = {
@@ -104,11 +107,9 @@ class ContactData extends Component {
                 },
                 value: 'cheapest',
             }
-        },
-        loading: false
+        }
     }
     componentDidMount() {
-        console.log(this.props);
         // const query = new URLSearchParams(this.props.location.search);
         // const ingredients = {};
         // let price = 0;
@@ -134,17 +135,18 @@ class ContactData extends Component {
             price: this.props.price,
             customer: customerData
         }
-        console.log(myOrder);
-        axios.post('/orders.json', myOrder).then(resp => {
-            this.setState({loading: false, purchasing: false});
-            this.props.history.push({
-                pathname: '/',
-                search: '?order=1'
-            })
-        }).catch(error => {
-            console.log(error);
-            this.setState({loading: false, purchasing: false});
-        })
+        this.props.onPurchaseStart(myOrder);
+        // console.log(myOrder);
+        // axios.post('/orders.json', myOrder).then(resp => {
+        //     this.setState({loading: false, purchasing: false});
+        //     this.props.history.push({
+        //         pathname: '/',
+        //         search: '?order=1'
+        //     })
+        // }).catch(error => {
+        //     console.log(error);
+        //     this.setState({loading: false, purchasing: false});
+        // })
     }
     onUpdateInput = (event) => {
         const newOrderForm = {
@@ -197,23 +199,41 @@ class ContactData extends Component {
                 <Button disabled={!orderAllowed} clicked={this.orderHandler} btnType="Success">ثبت سفارش</Button>
             </form>
         );
-        if (this.state.loading) {
+        if (this.props.loading) {
             form = <Spinner />
         }
-        return (
+        let ordering = (
+            <Modal show={this.props.error} modalClosed={this.onModalClosed}>
+                {this.props.error}
+            </Modal>,
             <div className={classes.ContactData}>
                 <h1>اطلاعات تماس خود را وارد کنید.</h1>
                 { form }
             </div>
         );
+        if (this.props.purchased) {
+            this.props.history.push({
+                pathname: '/',
+                search: '?order=1'
+            });
+        }
+        return ordering;
     }
 }
 
 
 const mapStateToProps = (state) => {
     return {
-        ings: state.ingredients,
-        price: state.totalPrice
+        ings: state.burgerBuilder.ingredients,
+        price: state.burgerBuilder.totalPrice,
+        loading: state.order.loading,
+        error: state.order.error,
+        purchased: state.order.purchased
     }
 }
-export default withRouter(connect(mapStateToProps)(ContactData));
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onPurchaseStart: (data) => dispatch(orderActions.purchaseBurgerStart(data))
+    }
+}
+export default withErrorHandler(withRouter(connect(mapStateToProps, mapDispatchToProps)(ContactData)), axios);

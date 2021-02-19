@@ -6,7 +6,8 @@ const initialStore = {
       cheese: 0,
       meat: 0
     },
-    totalPrice: 0,
+    totalPrice: 3.1,
+    error: null
   }
 
 
@@ -38,6 +39,22 @@ export const burgerBuilderReducer = (store = initialStore, action) => {
             ...store,
             ingredients: removeIngredients,
             totalPrice: store.totalPrice - INGREDIENT_PRICES[action.item]
+            }
+        case(actionTypes.SET_INGREDIENTS):
+            return {
+                ...store,
+                ingredients: {
+                    bacon: action.ings.bacon,
+                    meat: action.ings.meat,
+                    cheese: action.ings.cheese,
+                    salad: action.ings.salad
+                }
+            }
+        
+        case(actionTypes.FETCH_INGREDIENTS_FAIL):
+            return {
+                ...store,
+                error: action.error
             }
     }
     return store;
