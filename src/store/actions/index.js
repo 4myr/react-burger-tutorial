@@ -13,5 +13,6 @@ export {
     authStart,
     authFail,
     authSuccess,
-    authLogOut
+    authLogOut,
+    authLogOutSucceed
 } from './auth';

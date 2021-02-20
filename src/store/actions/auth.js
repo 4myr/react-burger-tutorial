@@ -31,6 +31,11 @@ export const authLogOut = () => {
     localStorage.removeItem('userId');
     localStorage.removeItem('token');
     return {
+        type: actionTypes.AUTH_INITIAL_LOGOUT
+    }
+}
+export const authLogOutSucceed = () => {
+    return {
         type: actionTypes.AUTH_LOGOUT
     }
 }
