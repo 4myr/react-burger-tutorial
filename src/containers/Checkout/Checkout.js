@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import CheckoutSummary from '../../components/Checkout/CheckoutSummary/CheckoutSummary';
 import { connect } from 'react-redux';
-class Checkout extends Component {
+const Checkout = props => {
     // state = {
     //     ingredients: {
     //         salad: 0,
@@ -11,8 +11,8 @@ class Checkout extends Component {
     //     },
     //     totalPrice: 0
     // };
-    componentDidMount() {
-        const query = new URLSearchParams(this.props.location.search);
+    useEffect(() => {
+        const query = new URLSearchParams(props.location.search);
         const ingredients = {};
         let price = 0;
         for (let param of query.entries()) {
@@ -21,22 +21,20 @@ class Checkout extends Component {
             else
                 ingredients[param[0]] = +param[1];
         }
-        this.setState({ingredients: ingredients, totalPrice: price});
-    }
-    purchaseHandler = () => {
-        this.props.history.push({
-            pathname: this.props.match.path + '/contact-data',
-            search: this.props.location.search
+        // this.setState({ingredients: ingredients, totalPrice: price});
+    }, []);
+    const purchaseHandler = () => {
+        props.history.push({
+            pathname: props.match.path + '/contact-data',
+            search: props.location.search
         })
     }
-    cancelHandler = () => {
-        this.props.history.goBack();
+    const cancelHandler = () => {
+        props.history.goBack();
     };
-    render() {
-        return (
-            <CheckoutSummary ingredients={this.props.ings} totalPrice={this.props.price} cancelClick={ this.cancelHandler } purchaseClick={ this.purchaseHandler } />
-        );
-    }
+    return (
+        <CheckoutSummary ingredients={props.ings} totalPrice={props.price} cancelClick={ cancelHandler } purchaseClick={ purchaseHandler } />
+    );
 }
 
 const mapStateToProps = (state) => {
